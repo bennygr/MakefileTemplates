@@ -1,0 +1,87 @@
+# Makefile template for building leadwerks 4 projects
+# -------------------------------------------------------------------------------
+PROJECTNAME=MyProjectName
+LEADWERKS=$(HOME)/.local/share/Steam/steamapps/common/Leadwerks
+# -------------------------------------------------------------------------------
+
+EXECUTABLE_RELEASE=$(PROJECTNAME)
+EXECUTABLE_DEBUG=$(PROJECTNAME).debug
+
+CC=g++
+CFLAGS= -std=c++11 \
+-Wall \
+-fexceptions \
+-msse3 \
+-DDG_DISABLE_ASSERT \
+-DZLIB -DPLATFORM_LINUX \
+-D_NEWTON_STATIC_LIB \
+-DFT2_BUILD_LIBRARY \
+-DOPENGL\
+-Dunix\
+-D__STEAM__ \
+-D_POSIX_VER\
+-D_POSIX_VER_64\
+-DDG_THREAD_EMULATION\
+-D_STATICLIB\
+-DDG_USE_THREAD_EMULATION\
+-DGL_GLEXT_PROTOTYPES\
+-DLEADWERKS_3_1 \
+-DLUA_USE_LINUX \
+-D_GLIBCXX_USE_CXX11_ABI=0 \
+-D_CUSTOM_JOINTS_STATIC_LIB 
+
+INCLUDEDIRS=-I$(LEADWERKS)/Include/Libraries/VHACD/src/VHACD_Lib/inc \
+-I$(LEADWERKS)/Include/Libraries/NewtonDynamics/coreLibrary_300/source/core \
+-I$(LEADWERKS)/Include/Libraries/NewtonDynamics/coreLibrary_300/source/meshUtil \
+-I$(LEADWERKS)/Include/Libraries/NewtonDynamics/coreLibrary_300/source/newton \
+-I$(LEADWERKS)/Include/Libraries/NewtonDynamics/coreLibrary_300/source/physics \
+-I$(LEADWERKS)/Include/Libraries/NewtonDynamics/packages/dMath \
+-I$(LEADWERKS)/Include/Libraries/NewtonDynamics/packages/dContainers \
+-I$(LEADWERKS)/Include/Libraries/NewtonDynamics/packages/dCustomJoints \
+-I$(LEADWERKS)/Include/Libraries/tolua++-1.0.93/include \
+-I$(LEADWERKS)/Include/Libraries/lua-5.1.4 \
+-I$(LEADWERKS)/Include/Libraries/freetype-2.4.7/include \
+-I$(LEADWERKS)/Include/Libraries/enet-1.3.1/include \
+-I$(LEADWERKS)/Include/Libraries/RecastNavigation/DebugUtils/Include \
+-I$(LEADWERKS)/Include/Libraries/RecastNavigation/Detour/Include \
+-I$(LEADWERKS)/Include/Libraries/RecastNavigation/DetourCrowd/Include \
+-I$(LEADWERKS)/Include/Libraries/RecastNavigation/DetourTileCache/Include \
+-I$(LEADWERKS)/Include/Libraries/RecastNavigation/Recast/Include \
+-I$(LEADWERKS)/Include/Libraries/libvorbis/include \
+-I$(LEADWERKS)/Include/Libraries/NewtonDynamics/packages/thirdParty/timeTracker \
+-I$(LEADWERKS)/Include/Libraries/libvorbis/lib \
+-I$(LEADWERKS)/Include/Libraries/libogg/include \
+-I$(LEADWERKS)/Include \
+-I$(LEADWERKS)/Include/Libraries/zlib-1.2.5 \
+-I$(LEADWERKS)/Include/Libraries/zlib-1.2.5/contrib/minizip \
+-I$(LEADWERKS)/Include/Libraries/freetype-2.4.7/include/freetype \
+-I$(LEADWERKS)/Include/Libraries/freetype-2.4.7/include/freetype/config \
+-I$(LEADWERKS)/Include/Libraries/LuaJIT/dynasm \
+-I$(LEADWERKS)/Include/Libraries/glew-1.6.0/include 
+
+LDFLAGS_DEBUG=-L$(LEADWERKS)/Library/Linux \
+-L$(LEADWERKS)/Library/Linux/Debug \
+-l:Leadwerks.a -ldl -lopenal -lGL -lGLU -lluajit ./libsteam_api.so -lX11 -lXext -lXrender -lXft -lpthread -lcurl -lopenvr_api -g -DDEBUG -D_DEBUG
+
+LDFLAGS_RELEASE=-L$(LEADWERKS)/Library/Linux \
+-L$(LEADWERKS)/Library/Linux/Release \
+-l:Leadwerks.a -ldl -lopenal -lGL -lGLU -lluajit ./libsteam_api.so -lX11 -lXext -lXrender -lXft -lpthread -lcurl -lopenvr_api -O2
+
+SOURCES=$(shell find ./Source -iname "*.cpp")
+
+OBJECTS=$(SOURCES:.cpp=.o)
+
+all: $(EXECUTABLE_RELEASE) $(EXECUTABLE_DEBUG)
+
+$(EXECUTABLE_RELEASE): $(OBJECTS)
+	$(CC) $(OBJECTS) $(LDFLAGS_RELEASE) -o $@
+
+$(EXECUTABLE_DEBUG): $(OBJECTS)
+	$(CC) $(OBJECTS) $(LDFLAGS_DEBUG) -o $@
+
+.cpp.o:
+	$(CC) -c $(CFLAGS) $(INCLUDEDIRS) $< -o $@
+
+clean:
+	-rm $(EXECUTABLE_DEBUG) $(EXECUTABLE_RELEASE) $(OBJECTS)
+

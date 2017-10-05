@@ -1,4 +1,4 @@
-# Makefile template for building leadwerks projects
+# Makefile template for building leadwerks 3 projects
 # -------------------------------------------------------------------------------
 PROJECTNAME=MyProjectName
 LEADWERKS=$(HOME)/.local/share/Steam/steamapps/common/Leadwerks
